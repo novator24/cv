@@ -1,0 +1,53 @@
+# Default values for warehouse-vlm-sorting.
+
+replicaCount: 1
+
+image:
+  yolo:
+    repository: gcr.io/your-project/yolo-detector
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  vlm:
+    repository: gcr.io/your-project/lfm2-vl-3b-inference
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  sync:
+    repository: gcr.io/your-project/camera-sync
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+# Настройки GKE (Google Kubernetes Engine) и ресурсов
+resources:
+  yolo:
+    limits:
+      nvidia.com/gpu: 1
+      memory: "8Gi"
+      cpu: "2"
+    requests:
+      memory: "4Gi"
+      cpu: "1"
+  vlm:
+    limits:
+      nvidia.com/gpu: 1
+      memory: "16Gi"
+      cpu: "4"
+    requests:
+      memory: "8Gi"
+      cpu: "2"
+
+nodeSelector:
+  yolo:
+    cloud.google.com/gke-accelerator: nvidia-tesla-t4 # Используем T4 для YOLO
+  vlm:
+    cloud.google.com/gke-accelerator: nvidia-l4 # Используем более современную L4 или A10G для VLM
+
+cameraSettings:
+  fps: 15
+  frameSkip: 2
+  streams:
+    - rtsp://camera1.local/stream
+    - rtsp://camera2.local/stream
+
+vlmSettings:
+  temporalMemoryFrames: 3
+  temperature: 0.2
